@@ -117,7 +117,17 @@ func RegisterDashboardTools(server *mcp.Server, client *metabase.Client) {
 		if dashboard.Description != "" {
 			sb.WriteString(fmt.Sprintf("Description: %s\n", dashboard.Description))
 		}
+
+		// Calculate grid usage from card positions
+		maxRow := 0
+		for _, dc := range dashboard.Cards {
+			if end := dc.Row + dc.SizeY; end > maxRow {
+				maxRow = end
+			}
+		}
+		sb.WriteString(fmt.Sprintf("Grid: 18 columns x %d rows (used)\n", maxRow))
 		sb.WriteString(fmt.Sprintf("Cards: %d\n\n", len(dashboard.Cards)))
+
 		for _, dc := range dashboard.Cards {
 			if dc.CardID == nil {
 				continue
