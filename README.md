@@ -22,6 +22,31 @@ A Model Context Protocol (MCP) server for [Metabase](https://www.metabase.com), 
 
 ## Installation
 
+### npx (Recommended)
+
+No prerequisites required. The binary is downloaded automatically on first run:
+
+```bash
+npx metabase-mcp
+```
+
+For Claude Code, use `npx` in your MCP config:
+
+```json
+{
+  "mcpServers": {
+    "metabase": {
+      "command": "npx",
+      "args": ["-y", "metabase-mcp"],
+      "env": {
+        "METABASE_URL": "https://your-metabase.example.com",
+        "METABASE_API_KEY": "mb_your_api_key_here"
+      }
+    }
+  }
+}
+```
+
 ### Pre-built binaries
 
 Download from [GitHub Releases](https://github.com/gobenpark/metabase-mcp/releases):
