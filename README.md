@@ -79,13 +79,24 @@ Go to **Metabase Admin** > **Settings** > **Authentication** > **API Keys** and 
 
 ### 2. Configure Claude Code
 
-Add to your `.mcp.json` (project-level) or `~/.claude/settings.json` (global):
+Using the CLI:
+
+```bash
+# Add to current project
+claude mcp add metabase -e METABASE_URL=https://your-metabase.example.com -e METABASE_API_KEY=mb_your_api_key_here -- npx -y metabase-mcp
+
+# Add globally (available in all projects)
+claude mcp add metabase -s user -e METABASE_URL=https://your-metabase.example.com -e METABASE_API_KEY=mb_your_api_key_here -- npx -y metabase-mcp
+```
+
+Or manually add to your `.mcp.json` (project-level) or `~/.claude/settings.json` (global):
 
 ```json
 {
   "mcpServers": {
     "metabase": {
-      "command": "metabase-mcp",
+      "command": "npx",
+      "args": ["-y", "metabase-mcp"],
       "env": {
         "METABASE_URL": "https://your-metabase.example.com",
         "METABASE_API_KEY": "mb_your_api_key_here"
