@@ -120,6 +120,15 @@ type AddCardToDashboardRequest struct {
 	SizeY  int `json:"size_y"`
 }
 
+// CreateCardRequest is the payload for creating a saved question (card).
+type CreateCardRequest struct {
+	Name         string       `json:"name"`
+	Description  string       `json:"description,omitempty"`
+	Display      string       `json:"display"`
+	CollectionID *int         `json:"collection_id,omitempty"`
+	DatasetQuery DatasetQuery `json:"dataset_query"`
+}
+
 // DatasetQuery is the payload for executing a native query.
 type DatasetQuery struct {
 	Database int              `json:"database"`

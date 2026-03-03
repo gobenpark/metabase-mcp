@@ -227,6 +227,22 @@ func (c *Client) AddCardToDashboard(ctx context.Context, dashboardID int, req Ad
 	return c.do(ctx, http.MethodPut, path, payload, nil)
 }
 
+// CreateCard creates a new saved question (card).
+func (c *Client) CreateCard(ctx context.Context, req CreateCardRequest) (*Card, error) {
+	var card Card
+	if err := c.do(ctx, http.MethodPost, "/api/card", req, &card); err != nil {
+		return nil, err
+	}
+	return &card, nil
+}
+
+// UpdateCardDisplay changes the display (chart) type of a saved question (card).
+func (c *Client) UpdateCardDisplay(ctx context.Context, cardID int, display string) error {
+	path := fmt.Sprintf("/api/card/%d", cardID)
+	payload := map[string]any{"display": display}
+	return c.do(ctx, http.MethodPut, path, payload, nil)
+}
+
 // UpdateDashboardCards updates the layout (position and size) of cards on a dashboard.
 func (c *Client) UpdateDashboardCards(ctx context.Context, dashboardID int, cards []map[string]any) error {
 	path := fmt.Sprintf("/api/dashboard/%d", dashboardID)

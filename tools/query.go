@@ -20,6 +20,22 @@ type RunQuestionInput struct {
 	QuestionID int `json:"question_id" jsonschema:"The ID of the saved question (card) to run"`
 }
 
+// CreateCardInput is the input for create_card.
+type CreateCardInput struct {
+	Name         string `json:"name" jsonschema:"Name for the new saved question"`
+	Description  string `json:"description,omitempty" jsonschema:"Optional description"`
+	DatabaseID   int    `json:"database_id" jsonschema:"The database ID to query against"`
+	Query        string `json:"query" jsonschema:"Native SQL query for this card"`
+	Display      string `json:"display,omitempty" jsonschema:"Chart type: table, bar, line, pie, scalar, row, area, combo, pivot, funnel, map, scatter, waterfall, progress, gauge (default: table)"`
+	CollectionID int    `json:"collection_id,omitempty" jsonschema:"Collection ID to save the card in. Omit for root collection."`
+}
+
+// UpdateCardDisplayInput is the input for update_card_display.
+type UpdateCardDisplayInput struct {
+	CardID  int    `json:"card_id" jsonschema:"The ID of the saved question (card) to update"`
+	Display string `json:"display" jsonschema:"Chart type: table, bar, line, pie, scalar, row, area, combo, pivot, funnel, map, scatter, waterfall, progress, gauge"`
+}
+
 // ListDatabasesInput is the input for list_databases (no params needed).
 type ListDatabasesInput struct{}
 
@@ -45,6 +61,44 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 			return errorResult(err), nil, nil
 		}
 		return textResult(formatQueryResult(result)), nil, nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "create_card",
+		Description: "Create a new saved question (card) with a native SQL query. You can specify the chart type (display) when creating.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, input CreateCardInput) (*mcp.CallToolResult, any, error) {
+		display := input.Display
+		if display == "" {
+			display = "table"
+		}
+		mbReq := metabase.CreateCardRequest{
+			Name:        input.Name,
+			Description: input.Description,
+			Display:     display,
+			DatasetQuery: metabase.DatasetQuery{
+				Database: input.DatabaseID,
+				Type:     "native",
+				Native:   &metabase.NativeQuery{Query: input.Query},
+			},
+		}
+		if input.CollectionID > 0 {
+			mbReq.CollectionID = &input.CollectionID
+		}
+		card, err := client.CreateCard(ctx, mbReq)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		return textResult(fmt.Sprintf("Card created successfully!\n- ID: %d\n- Name: %s\n- Display: %s", card.ID, card.Name, display)), nil, nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "update_card_display",
+		Description: "Change the chart/visualization type of a saved question (card). Supported types: table, bar, line, pie, scalar, row, area, combo, pivot, funnel, map, scatter, waterfall, progress, gauge.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, input UpdateCardDisplayInput) (*mcp.CallToolResult, any, error) {
+		if err := client.UpdateCardDisplay(ctx, input.CardID, input.Display); err != nil {
+			return errorResult(err), nil, nil
+		}
+		return textResult(fmt.Sprintf("Card #%d display changed to '%s'!", input.CardID, input.Display)), nil, nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
