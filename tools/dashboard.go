@@ -65,6 +65,21 @@ type AddCardToDashboardInput struct {
 	SizeY       int `json:"size_y,omitempty" jsonschema:"Height in grid units (default 4)"`
 }
 
+// CardLayoutItem represents the layout of a single card on the dashboard grid.
+type CardLayoutItem struct {
+	DashcardID int `json:"dashcard_id" jsonschema:"The dashcard ID (from get_dashboard result)"`
+	Row        int `json:"row" jsonschema:"Row position on the dashboard grid"`
+	Col        int `json:"col" jsonschema:"Column position on the dashboard grid"`
+	SizeX      int `json:"size_x" jsonschema:"Width in grid units"`
+	SizeY      int `json:"size_y" jsonschema:"Height in grid units"`
+}
+
+// UpdateDashboardCardsInput is the input for update_dashboard_cards.
+type UpdateDashboardCardsInput struct {
+	DashboardID int              `json:"dashboard_id" jsonschema:"The ID of the dashboard to update"`
+	Cards       []CardLayoutItem `json:"cards" jsonschema:"Array of card layouts to update. Each must include dashcard_id, row, col, size_x, size_y."`
+}
+
 // RegisterDashboardTools registers all dashboard/collection tools on the MCP server.
 func RegisterDashboardTools(server *mcp.Server, client *metabase.Client) {
 	mcp.AddTool(server, &mcp.Tool{
@@ -111,7 +126,9 @@ func RegisterDashboardTools(server *mcp.Server, client *metabase.Client) {
 			if desc == "" {
 				desc = "(no description)"
 			}
-			sb.WriteString(fmt.Sprintf("  - [%d] %s (%s) — %s\n", dc.Card.ID, dc.Card.Name, dc.Card.Display, desc))
+			sb.WriteString(fmt.Sprintf("  - [dashcard:%d, card:%d] %s (%s) — %s  [row=%d, col=%d, size=%dx%d]\n",
+				dc.ID, dc.Card.ID, dc.Card.Name, dc.Card.Display, desc,
+				dc.Row, dc.Col, dc.SizeX, dc.SizeY))
 		}
 		return textResult(sb.String()), nil, nil
 	})
@@ -228,6 +245,47 @@ func RegisterDashboardTools(server *mcp.Server, client *metabase.Client) {
 			return errorResult(err), nil, nil
 		}
 		return textResult(fmt.Sprintf("Dashboard created successfully!\n- ID: %d\n- Name: %s", dashboard.ID, dashboard.Name)), nil, nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "update_dashboard_cards",
+		Description: "Update the layout (position and size) of cards on a dashboard. Use get_dashboard first to see current dashcard IDs and layout.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, input UpdateDashboardCardsInput) (*mcp.CallToolResult, any, error) {
+		existing, err := client.GetDashboard(ctx, input.DashboardID)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+
+		// Build a map of updates keyed by dashcard ID
+		updates := make(map[int]CardLayoutItem)
+		for _, c := range input.Cards {
+			updates[c.DashcardID] = c
+		}
+
+		// Merge updates with existing cards
+		cards := make([]map[string]any, 0, len(existing.Cards))
+		for _, dc := range existing.Cards {
+			entry := map[string]any{
+				"id":      dc.ID,
+				"card_id": dc.CardID,
+				"row":     dc.Row,
+				"col":     dc.Col,
+				"size_x":  dc.SizeX,
+				"size_y":  dc.SizeY,
+			}
+			if u, ok := updates[dc.ID]; ok {
+				entry["row"] = u.Row
+				entry["col"] = u.Col
+				entry["size_x"] = u.SizeX
+				entry["size_y"] = u.SizeY
+			}
+			cards = append(cards, entry)
+		}
+
+		if err := client.UpdateDashboardCards(ctx, input.DashboardID, cards); err != nil {
+			return errorResult(err), nil, nil
+		}
+		return textResult(fmt.Sprintf("Updated layout of %d card(s) on dashboard #%d!", len(input.Cards), input.DashboardID)), nil, nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{

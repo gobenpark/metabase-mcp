@@ -213,14 +213,23 @@ func (c *Client) AddCardToDashboard(ctx context.Context, dashboardID int, req Ad
 		cards = append(cards, map[string]any{
 			"id":      dc.ID,
 			"card_id": dc.CardID,
-			"row":     0,
-			"col":     0,
-			"size_x":  6,
-			"size_y":  4,
+			"row":     dc.Row,
+			"col":     dc.Col,
+			"size_x":  dc.SizeX,
+			"size_y":  dc.SizeY,
 		})
 	}
 	cards = append(cards, newCard)
 
+	payload := map[string]any{
+		"dashcards": cards,
+	}
+	return c.do(ctx, http.MethodPut, path, payload, nil)
+}
+
+// UpdateDashboardCards updates the layout (position and size) of cards on a dashboard.
+func (c *Client) UpdateDashboardCards(ctx context.Context, dashboardID int, cards []map[string]any) error {
+	path := fmt.Sprintf("/api/dashboard/%d", dashboardID)
 	payload := map[string]any{
 		"dashcards": cards,
 	}

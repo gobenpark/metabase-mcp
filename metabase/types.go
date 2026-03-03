@@ -67,6 +67,10 @@ type DashboardCard struct {
 	ID     int  `json:"id"`
 	CardID *int `json:"card_id"`
 	Card   Card `json:"card"`
+	Row    int  `json:"row"`
+	Col    int  `json:"col"`
+	SizeX  int  `json:"size_x"`
+	SizeY  int  `json:"size_y"`
 }
 
 // Collection represents a Metabase collection (folder).
