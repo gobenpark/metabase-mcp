@@ -125,7 +125,7 @@ func RegisterDashboardTools(server *mcp.Server, client *metabase.Client) {
 				maxRow = end
 			}
 		}
-		sb.WriteString(fmt.Sprintf("Grid: 18 columns x %d rows (used)\n", maxRow))
+		sb.WriteString(fmt.Sprintf("Grid: 24 columns x %d rows (used)\n", maxRow))
 		sb.WriteString(fmt.Sprintf("Cards: %d\n\n", len(dashboard.Cards)))
 
 		for _, dc := range dashboard.Cards {
