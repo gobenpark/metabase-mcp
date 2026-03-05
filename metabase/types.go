@@ -52,6 +52,26 @@ type Card struct {
 	Archived    bool   `json:"archived"`
 }
 
+// CardDetail is a Card with its dataset query included (from GET /api/card/:id).
+type CardDetail struct {
+	Card
+	DatasetQuery CardDatasetQuery `json:"dataset_query"`
+}
+
+// CardDatasetQuery wraps the query stages returned by the Metabase card API.
+type CardDatasetQuery struct {
+	Database int              `json:"database"`
+	Type     string           `json:"type"`
+	Native   *NativeQuery     `json:"native,omitempty"`
+	// New MBQL stages format
+	Stages []CardQueryStage `json:"stages,omitempty"`
+}
+
+// CardQueryStage is a single stage in the new MBQL query format.
+type CardQueryStage struct {
+	Native string `json:"native,omitempty"`
+}
+
 // Dashboard represents a Metabase dashboard.
 type Dashboard struct {
 	ID          int             `json:"id"`
@@ -127,6 +147,15 @@ type CreateCardRequest struct {
 	Display      string       `json:"display"`
 	CollectionID *int         `json:"collection_id,omitempty"`
 	DatasetQuery DatasetQuery `json:"dataset_query"`
+}
+
+// UpdateCardRequest is the payload for updating a saved question (card).
+// All fields are optional — only non-zero values are sent.
+type UpdateCardRequest struct {
+	Name         string        `json:"name,omitempty"`
+	Description  string        `json:"description,omitempty"`
+	Display      string        `json:"display,omitempty"`
+	DatasetQuery *DatasetQuery `json:"dataset_query,omitempty"`
 }
 
 // DatasetQuery is the payload for executing a native query.

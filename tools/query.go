@@ -36,6 +36,20 @@ type UpdateCardDisplayInput struct {
 	Display string `json:"display" jsonschema:"Chart type: table, bar, line, pie, scalar, row, area, combo, pivot, funnel, map, scatter, waterfall, progress, gauge"`
 }
 
+// UpdateCardInput is the input for update_card.
+type UpdateCardInput struct {
+	CardID      int    `json:"card_id" jsonschema:"The ID of the saved question (card) to update"`
+	Query       string `json:"query,omitempty" jsonschema:"New native SQL query. Omit to leave unchanged."`
+	DatabaseID  int    `json:"database_id,omitempty" jsonschema:"Database ID for the query. Required when updating query."`
+	Name        string `json:"name,omitempty" jsonschema:"New name for the card. Omit to leave unchanged."`
+	Description string `json:"description,omitempty" jsonschema:"New description for the card. Omit to leave unchanged."`
+}
+
+// GetCardInput is the input for get_card.
+type GetCardInput struct {
+	CardID int `json:"card_id" jsonschema:"The ID of the saved question (card) to retrieve"`
+}
+
 // ListDatabasesInput is the input for list_databases (no params needed).
 type ListDatabasesInput struct{}
 
@@ -99,6 +113,58 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 			return errorResult(err), nil, nil
 		}
 		return textResult(fmt.Sprintf("Card #%d display changed to '%s'!", input.CardID, input.Display)), nil, nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "get_card",
+		Description: "Get a saved question (card) by ID, including its current SQL query and metadata.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, input GetCardInput) (*mcp.CallToolResult, any, error) {
+		card, err := client.GetCard(ctx, input.CardID)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		var sb strings.Builder
+		sb.WriteString(fmt.Sprintf("Card #%d: %s\n", card.ID, card.Name))
+		if card.Description != "" {
+			sb.WriteString(fmt.Sprintf("Description: %s\n", card.Description))
+		}
+		sb.WriteString(fmt.Sprintf("Display: %s\n", card.Display))
+		// Extract SQL from either the legacy native format or new stages format
+		sql := ""
+		if card.DatasetQuery.Native != nil {
+			sql = card.DatasetQuery.Native.Query
+		} else if len(card.DatasetQuery.Stages) > 0 {
+			sql = card.DatasetQuery.Stages[0].Native
+		}
+		if sql != "" {
+			sb.WriteString(fmt.Sprintf("\nSQL:\n%s", sql))
+		}
+		return textResult(sb.String()), nil, nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "update_card",
+		Description: "Update a saved question (card): change its SQL query, name, or description. Provide only the fields you want to change.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, input UpdateCardInput) (*mcp.CallToolResult, any, error) {
+		if input.Query != "" && input.DatabaseID == 0 {
+			return errorResult(fmt.Errorf("database_id is required when updating query")), nil, nil
+		}
+		mbReq := metabase.UpdateCardRequest{
+			Name:        input.Name,
+			Description: input.Description,
+		}
+		if input.Query != "" {
+			mbReq.DatasetQuery = &metabase.DatasetQuery{
+				Database: input.DatabaseID,
+				Type:     "native",
+				Native:   &metabase.NativeQuery{Query: input.Query},
+			}
+		}
+		card, err := client.UpdateCard(ctx, input.CardID, mbReq)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		return textResult(fmt.Sprintf("Card #%d updated successfully!\n- Name: %s", card.ID, card.Name)), nil, nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{

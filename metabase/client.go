@@ -243,6 +243,26 @@ func (c *Client) UpdateCardDisplay(ctx context.Context, cardID int, display stri
 	return c.do(ctx, http.MethodPut, path, payload, nil)
 }
 
+// UpdateCard updates a saved question (card). Only non-zero fields in req are applied.
+func (c *Client) UpdateCard(ctx context.Context, cardID int, req UpdateCardRequest) (*Card, error) {
+	path := fmt.Sprintf("/api/card/%d", cardID)
+	var card Card
+	if err := c.do(ctx, http.MethodPut, path, req, &card); err != nil {
+		return nil, err
+	}
+	return &card, nil
+}
+
+// GetCard returns a single saved question (card) by ID including its SQL query.
+func (c *Client) GetCard(ctx context.Context, cardID int) (*CardDetail, error) {
+	path := fmt.Sprintf("/api/card/%d", cardID)
+	var card CardDetail
+	if err := c.do(ctx, http.MethodGet, path, nil, &card); err != nil {
+		return nil, err
+	}
+	return &card, nil
+}
+
 // UpdateDashboardCards updates the layout (position and size) of cards on a dashboard.
 func (c *Client) UpdateDashboardCards(ctx context.Context, dashboardID int, cards []map[string]any) error {
 	path := fmt.Sprintf("/api/dashboard/%d", dashboardID)
