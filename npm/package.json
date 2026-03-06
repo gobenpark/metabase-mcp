@@ -1,6 +1,6 @@
 {
   "name": "metabase-mcp",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "MCP server for Metabase - connect Claude to your Metabase instance",
   "bin": {
     "metabase-mcp": "run.js"
@@ -19,6 +19,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gobenpark/metabase-mcp"
+    "url": "git+https://github.com/gobenpark/metabase-mcp.git"
   }
 }
