@@ -14,7 +14,7 @@ type ListDashboardsInput struct{}
 
 // GetDashboardInput is the input for get_dashboard.
 type GetDashboardInput struct {
-	DashboardID int `json:"dashboard_id" jsonschema:"The ID of the dashboard to retrieve"`
+	DashboardID int `json:"dashboard_id"`
 }
 
 // ListCollectionsInput is the input for list_collections.
@@ -22,62 +22,62 @@ type ListCollectionsInput struct{}
 
 // SearchInput is the input for the search tool.
 type SearchInput struct {
-	Query string `json:"query" jsonschema:"Search query text to find questions, dashboards, and collections"`
+	Query string `json:"query"`
 }
 
 // DeleteDashboardInput is the input for delete_dashboard.
 type DeleteDashboardInput struct {
-	DashboardID int `json:"dashboard_id" jsonschema:"The ID of the dashboard to delete"`
+	DashboardID int `json:"dashboard_id"`
 }
 
 // ArchiveCollectionInput is the input for archive_collection.
 type ArchiveCollectionInput struct {
-	CollectionID int `json:"collection_id" jsonschema:"The ID of the collection to archive"`
+	CollectionID int `json:"collection_id"`
 }
 
 // MoveDashboardInput is the input for move_dashboard.
 type MoveDashboardInput struct {
-	DashboardID  int `json:"dashboard_id" jsonschema:"The ID of the dashboard to move"`
-	CollectionID int `json:"collection_id" jsonschema:"The target collection ID to move the dashboard to"`
+	DashboardID  int `json:"dashboard_id"`
+	CollectionID int `json:"collection_id"`
 }
 
 // CreateCollectionInput is the input for create_collection.
 type CreateCollectionInput struct {
-	Name        string `json:"name" jsonschema:"Name for the new collection (folder)"`
-	Description string `json:"description,omitempty" jsonschema:"Optional description"`
-	ParentID    int    `json:"parent_id,omitempty" jsonschema:"Parent collection ID. Omit to create at root level."`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	ParentID    int    `json:"parent_id,omitempty"`
 }
 
 // CreateDashboardInput is the input for create_dashboard.
 type CreateDashboardInput struct {
-	Name         string `json:"name" jsonschema:"Name for the new dashboard"`
-	Description  string `json:"description,omitempty" jsonschema:"Optional description for the dashboard"`
-	CollectionID int    `json:"collection_id,omitempty" jsonschema:"Collection ID to place the dashboard in. Omit for root collection."`
+	Name         string `json:"name"`
+	Description  string `json:"description,omitempty"`
+	CollectionID int    `json:"collection_id,omitempty"`
 }
 
 // AddCardToDashboardInput is the input for add_card_to_dashboard.
 type AddCardToDashboardInput struct {
-	DashboardID int `json:"dashboard_id" jsonschema:"The ID of the dashboard to add the card to"`
-	CardID      int `json:"card_id" jsonschema:"The ID of the saved question (card) to add"`
-	Row         int `json:"row,omitempty" jsonschema:"Row position on the dashboard grid (default 0)"`
-	Col         int `json:"col,omitempty" jsonschema:"Column position on the dashboard grid (default 0)"`
-	SizeX       int `json:"size_x,omitempty" jsonschema:"Width in grid units (default 6)"`
-	SizeY       int `json:"size_y,omitempty" jsonschema:"Height in grid units (default 4)"`
+	DashboardID int `json:"dashboard_id"`
+	CardID      int `json:"card_id"`
+	Row         int `json:"row,omitempty"`
+	Col         int `json:"col,omitempty"`
+	SizeX       int `json:"size_x,omitempty"`
+	SizeY       int `json:"size_y,omitempty"`
 }
 
 // CardLayoutItem represents the layout of a single card on the dashboard grid.
 type CardLayoutItem struct {
-	DashcardID int `json:"dashcard_id" jsonschema:"The dashcard ID (from get_dashboard result)"`
-	Row        int `json:"row" jsonschema:"Row position on the dashboard grid"`
-	Col        int `json:"col" jsonschema:"Column position on the dashboard grid"`
-	SizeX      int `json:"size_x" jsonschema:"Width in grid units"`
-	SizeY      int `json:"size_y" jsonschema:"Height in grid units"`
+	DashcardID int `json:"dashcard_id"`
+	Row        int `json:"row"`
+	Col        int `json:"col"`
+	SizeX      int `json:"size_x"`
+	SizeY      int `json:"size_y"`
 }
 
 // UpdateDashboardCardsInput is the input for update_dashboard_cards.
 type UpdateDashboardCardsInput struct {
-	DashboardID int              `json:"dashboard_id" jsonschema:"The ID of the dashboard to update"`
-	Cards       []CardLayoutItem `json:"cards" jsonschema:"Array of card layouts to update. Each must include dashcard_id, row, col, size_x, size_y."`
+	DashboardID int              `json:"dashboard_id"`
+	Cards       []CardLayoutItem `json:"cards"`
 }
 
 // RegisterDashboardTools registers all dashboard/collection tools on the MCP server.

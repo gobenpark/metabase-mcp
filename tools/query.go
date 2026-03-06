@@ -11,43 +11,43 @@ import (
 
 // ExecuteQueryInput is the input for the execute_query tool.
 type ExecuteQueryInput struct {
-	DatabaseID int    `json:"database_id" jsonschema:"The ID of the database to query"`
-	Query      string `json:"query" jsonschema:"The native SQL query to execute"`
+	DatabaseID int    `json:"database_id"`
+	Query      string `json:"query"`
 }
 
 // RunQuestionInput is the input for the run_question tool.
 type RunQuestionInput struct {
-	QuestionID int `json:"question_id" jsonschema:"The ID of the saved question (card) to run"`
+	QuestionID int `json:"question_id"`
 }
 
 // CreateCardInput is the input for create_card.
 type CreateCardInput struct {
-	Name         string `json:"name" jsonschema:"Name for the new saved question"`
-	Description  string `json:"description,omitempty" jsonschema:"Optional description"`
-	DatabaseID   int    `json:"database_id" jsonschema:"The database ID to query against"`
-	Query        string `json:"query" jsonschema:"Native SQL query for this card"`
-	Display      string `json:"display,omitempty" jsonschema:"Chart type: table, bar, line, pie, scalar, row, area, combo, pivot, funnel, map, scatter, waterfall, progress, gauge (default: table)"`
-	CollectionID int    `json:"collection_id,omitempty" jsonschema:"Collection ID to save the card in. Omit for root collection."`
+	Name         string `json:"name"`
+	Description  string `json:"description,omitempty"`
+	DatabaseID   int    `json:"database_id"`
+	Query        string `json:"query"`
+	Display      string `json:"display,omitempty"`
+	CollectionID int    `json:"collection_id,omitempty"`
 }
 
 // UpdateCardDisplayInput is the input for update_card_display.
 type UpdateCardDisplayInput struct {
-	CardID  int    `json:"card_id" jsonschema:"The ID of the saved question (card) to update"`
-	Display string `json:"display" jsonschema:"Chart type: table, bar, line, pie, scalar, row, area, combo, pivot, funnel, map, scatter, waterfall, progress, gauge"`
+	CardID  int    `json:"card_id"`
+	Display string `json:"display"`
 }
 
 // UpdateCardInput is the input for update_card.
 type UpdateCardInput struct {
-	CardID      int    `json:"card_id" jsonschema:"The ID of the saved question (card) to update"`
-	Query       string `json:"query,omitempty" jsonschema:"New native SQL query. Omit to leave unchanged."`
-	DatabaseID  int    `json:"database_id,omitempty" jsonschema:"Database ID for the query. Required when updating query."`
-	Name        string `json:"name,omitempty" jsonschema:"New name for the card. Omit to leave unchanged."`
-	Description string `json:"description,omitempty" jsonschema:"New description for the card. Omit to leave unchanged."`
+	CardID      int    `json:"card_id"`
+	Query       string `json:"query,omitempty"`
+	DatabaseID  int    `json:"database_id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 // GetCardInput is the input for get_card.
 type GetCardInput struct {
-	CardID int `json:"card_id" jsonschema:"The ID of the saved question (card) to retrieve"`
+	CardID int `json:"card_id"`
 }
 
 // ListDatabasesInput is the input for list_databases (no params needed).

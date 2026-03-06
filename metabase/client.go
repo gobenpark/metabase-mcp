@@ -200,23 +200,27 @@ func (c *Client) AddCardToDashboard(ctx context.Context, dashboardID int, req Ad
 	}
 
 	newCard := map[string]any{
-		"id":      -1,
-		"card_id": req.CardID,
-		"row":     req.Row,
-		"col":     req.Col,
-		"size_x":  req.SizeX,
-		"size_y":  req.SizeY,
+		"id":                     -1,
+		"card_id":                req.CardID,
+		"row":                    req.Row,
+		"col":                    req.Col,
+		"size_x":                 req.SizeX,
+		"size_y":                 req.SizeY,
+		"parameter_mappings":     []any{},
+		"visualization_settings": map[string]any{},
 	}
 
 	cards := make([]map[string]any, 0, len(existing.Cards)+1)
 	for _, dc := range existing.Cards {
 		cards = append(cards, map[string]any{
-			"id":      dc.ID,
-			"card_id": dc.CardID,
-			"row":     dc.Row,
-			"col":     dc.Col,
-			"size_x":  dc.SizeX,
-			"size_y":  dc.SizeY,
+			"id":                     dc.ID,
+			"card_id":                dc.CardID,
+			"row":                    dc.Row,
+			"col":                    dc.Col,
+			"size_x":                 dc.SizeX,
+			"size_y":                 dc.SizeY,
+			"parameter_mappings":     []any{},
+			"visualization_settings": map[string]any{},
 		})
 	}
 	cards = append(cards, newCard)
