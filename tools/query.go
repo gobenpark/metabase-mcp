@@ -92,7 +92,7 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 		if display == "" {
 			display = "table"
 		}
-		vizSettings := input.VisualizationSettings
+		vizSettings := normalizeVizSettings(input.VisualizationSettings)
 		if vizSettings == nil {
 			vizSettings = map[string]any{}
 		}
@@ -164,7 +164,7 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 		mbReq := metabase.UpdateCardRequest{
 			Name:                  input.Name,
 			Description:           input.Description,
-			VisualizationSettings: input.VisualizationSettings,
+			VisualizationSettings: normalizeVizSettings(input.VisualizationSettings),
 		}
 		if input.Query != "" {
 			mbReq.DatasetQuery = &metabase.DatasetQuery{
@@ -243,6 +243,28 @@ func formatQueryResult(result *metabase.QueryResult) string {
 
 	sb.WriteString(fmt.Sprintf("\nTotal rows: %d", len(result.Data.Rows)))
 	return sb.String()
+}
+
+// normalizeVizSettings lowercases column references in visualization_settings
+// because Metabase returns native query column names in lowercase.
+func normalizeVizSettings(settings map[string]any) map[string]any {
+	if settings == nil {
+		return nil
+	}
+	keysToNormalize := []string{"graph.dimensions", "graph.metrics"}
+	for _, key := range keysToNormalize {
+		if vals, ok := settings[key]; ok {
+			if arr, ok := vals.([]any); ok {
+				for i, v := range arr {
+					if s, ok := v.(string); ok {
+						arr[i] = strings.ToLower(s)
+					}
+				}
+				settings[key] = arr
+			}
+		}
+	}
+	return settings
 }
 
 func textResult(text string) *mcp.CallToolResult {
