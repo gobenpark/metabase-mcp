@@ -142,20 +142,22 @@ type AddCardToDashboardRequest struct {
 
 // CreateCardRequest is the payload for creating a saved question (card).
 type CreateCardRequest struct {
-	Name         string       `json:"name"`
-	Description  string       `json:"description,omitempty"`
-	Display      string       `json:"display"`
-	CollectionID *int         `json:"collection_id,omitempty"`
-	DatasetQuery DatasetQuery `json:"dataset_query"`
+	Name                  string         `json:"name"`
+	Description           string         `json:"description,omitempty"`
+	Display               string         `json:"display"`
+	CollectionID          *int           `json:"collection_id,omitempty"`
+	DatasetQuery          DatasetQuery   `json:"dataset_query"`
+	VisualizationSettings map[string]any `json:"visualization_settings"`
 }
 
 // UpdateCardRequest is the payload for updating a saved question (card).
 // All fields are optional — only non-zero values are sent.
 type UpdateCardRequest struct {
-	Name         string        `json:"name,omitempty"`
-	Description  string        `json:"description,omitempty"`
-	Display      string        `json:"display,omitempty"`
-	DatasetQuery *DatasetQuery `json:"dataset_query,omitempty"`
+	Name                  string         `json:"name,omitempty"`
+	Description           string         `json:"description,omitempty"`
+	Display               string         `json:"display,omitempty"`
+	DatasetQuery          *DatasetQuery  `json:"dataset_query,omitempty"`
+	VisualizationSettings map[string]any `json:"visualization_settings,omitempty"`
 }
 
 // DatasetQuery is the payload for executing a native query.

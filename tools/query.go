@@ -22,12 +22,13 @@ type RunQuestionInput struct {
 
 // CreateCardInput is the input for create_card.
 type CreateCardInput struct {
-	Name         string `json:"name"`
-	Description  string `json:"description,omitempty"`
-	DatabaseID   int    `json:"database_id"`
-	Query        string `json:"query"`
-	Display      string `json:"display,omitempty"`
-	CollectionID int    `json:"collection_id,omitempty"`
+	Name                  string         `json:"name"`
+	Description           string         `json:"description,omitempty"`
+	DatabaseID            int            `json:"database_id"`
+	Query                 string         `json:"query"`
+	Display               string         `json:"display,omitempty"`
+	CollectionID          int            `json:"collection_id,omitempty"`
+	VisualizationSettings map[string]any `json:"visualization_settings,omitempty"`
 }
 
 // UpdateCardDisplayInput is the input for update_card_display.
@@ -38,11 +39,12 @@ type UpdateCardDisplayInput struct {
 
 // UpdateCardInput is the input for update_card.
 type UpdateCardInput struct {
-	CardID      int    `json:"card_id"`
-	Query       string `json:"query,omitempty"`
-	DatabaseID  int    `json:"database_id,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	CardID                int            `json:"card_id"`
+	Query                 string         `json:"query,omitempty"`
+	DatabaseID            int            `json:"database_id,omitempty"`
+	Name                  string         `json:"name,omitempty"`
+	Description           string         `json:"description,omitempty"`
+	VisualizationSettings map[string]any `json:"visualization_settings,omitempty"`
 }
 
 // GetCardInput is the input for get_card.
@@ -85,6 +87,10 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 		if display == "" {
 			display = "table"
 		}
+		vizSettings := input.VisualizationSettings
+		if vizSettings == nil {
+			vizSettings = map[string]any{}
+		}
 		mbReq := metabase.CreateCardRequest{
 			Name:        input.Name,
 			Description: input.Description,
@@ -94,6 +100,7 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 				Type:     "native",
 				Native:   &metabase.NativeQuery{Query: input.Query},
 			},
+			VisualizationSettings: vizSettings,
 		}
 		if input.CollectionID > 0 {
 			mbReq.CollectionID = &input.CollectionID
@@ -150,8 +157,9 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 			return errorResult(fmt.Errorf("database_id is required when updating query")), nil, nil
 		}
 		mbReq := metabase.UpdateCardRequest{
-			Name:        input.Name,
-			Description: input.Description,
+			Name:                  input.Name,
+			Description:           input.Description,
+			VisualizationSettings: input.VisualizationSettings,
 		}
 		if input.Query != "" {
 			mbReq.DatasetQuery = &metabase.DatasetQuery{
