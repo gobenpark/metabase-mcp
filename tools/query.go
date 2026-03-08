@@ -52,6 +52,11 @@ type GetCardInput struct {
 	CardID int `json:"card_id"`
 }
 
+// ArchiveCardInput is the input for archive_card.
+type ArchiveCardInput struct {
+	CardID int `json:"card_id"`
+}
+
 // ListDatabasesInput is the input for list_databases (no params needed).
 type ListDatabasesInput struct{}
 
@@ -173,6 +178,16 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 			return errorResult(err), nil, nil
 		}
 		return textResult(fmt.Sprintf("Card #%d updated successfully!\n- Name: %s", card.ID, card.Name)), nil, nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "archive_card",
+		Description: "Archive (soft-delete) a saved question (card). The card can be restored from the Metabase trash.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, input ArchiveCardInput) (*mcp.CallToolResult, any, error) {
+		if err := client.ArchiveCard(ctx, input.CardID); err != nil {
+			return errorResult(err), nil, nil
+		}
+		return textResult(fmt.Sprintf("Card #%d archived successfully!", input.CardID)), nil, nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{

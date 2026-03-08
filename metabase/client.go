@@ -231,6 +231,13 @@ func (c *Client) AddCardToDashboard(ctx context.Context, dashboardID int, req Ad
 	return c.do(ctx, http.MethodPut, path, payload, nil)
 }
 
+// ArchiveCard archives a saved question (card) by setting archived=true.
+func (c *Client) ArchiveCard(ctx context.Context, cardID int) error {
+	path := fmt.Sprintf("/api/card/%d", cardID)
+	payload := map[string]any{"archived": true}
+	return c.do(ctx, http.MethodPut, path, payload, nil)
+}
+
 // CreateCard creates a new saved question (card).
 func (c *Client) CreateCard(ctx context.Context, req CreateCardRequest) (*Card, error) {
 	var card Card
