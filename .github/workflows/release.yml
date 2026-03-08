@@ -43,3 +43,11 @@ jobs:
         run: cd npm && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit updated npm package version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add npm/package.json
+          git diff --cached --quiet || git commit -m "chore: bump npm package version to ${GITHUB_REF_NAME#v}"
+          git push origin HEAD:main
