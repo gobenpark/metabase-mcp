@@ -23,6 +23,7 @@ type RunQuestionInput struct {
 // CreateCardInput is the input for create_card.
 type CreateCardInput struct {
 	Name                  string         `json:"name"`
+	Type                  string         `json:"type,omitempty"`
 	Description           string         `json:"description,omitempty"`
 	DatabaseID            int            `json:"database_id"`
 	Query                 string         `json:"query"`
@@ -40,6 +41,7 @@ type UpdateCardDisplayInput struct {
 // UpdateCardInput is the input for update_card.
 type UpdateCardInput struct {
 	CardID                int            `json:"card_id"`
+	Type                  string         `json:"type,omitempty"`
 	Query                 string         `json:"query,omitempty"`
 	DatabaseID            int            `json:"database_id,omitempty"`
 	Name                  string         `json:"name,omitempty"`
@@ -86,7 +88,7 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        "create_card",
-		Description: "Create a new saved question (card) with a native SQL query. You can specify the chart type (display) when creating.",
+		Description: "Create a new saved question (card) with a native SQL query. You can specify the chart type (display) and card type (question, model, or metric) when creating.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, input CreateCardInput) (*mcp.CallToolResult, any, error) {
 		display := input.Display
 		if display == "" {
@@ -98,6 +100,7 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 		}
 		mbReq := metabase.CreateCardRequest{
 			Name:        input.Name,
+			Type:        input.Type,
 			Description: input.Description,
 			Display:     display,
 			DatasetQuery: metabase.DatasetQuery{
@@ -114,7 +117,11 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		return textResult(fmt.Sprintf("Card created successfully!\n- ID: %d\n- Name: %s\n- Display: %s", card.ID, card.Name, display)), nil, nil
+		cardType := input.Type
+		if cardType == "" {
+			cardType = "question"
+		}
+		return textResult(fmt.Sprintf("Card created successfully!\n- ID: %d\n- Name: %s\n- Type: %s\n- Display: %s", card.ID, card.Name, cardType, display)), nil, nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
@@ -156,13 +163,14 @@ func RegisterQueryTools(server *mcp.Server, client *metabase.Client) {
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        "update_card",
-		Description: "Update a saved question (card): change its SQL query, name, or description. Provide only the fields you want to change.",
+		Description: "Update a saved question (card): change its SQL query, name, description, or type (question, model, metric). Provide only the fields you want to change.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, input UpdateCardInput) (*mcp.CallToolResult, any, error) {
 		if input.Query != "" && input.DatabaseID == 0 {
 			return errorResult(fmt.Errorf("database_id is required when updating query")), nil, nil
 		}
 		mbReq := metabase.UpdateCardRequest{
 			Name:                  input.Name,
+			Type:                  input.Type,
 			Description:           input.Description,
 			VisualizationSettings: normalizeVizSettings(input.VisualizationSettings),
 		}

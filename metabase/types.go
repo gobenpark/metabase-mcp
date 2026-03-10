@@ -143,6 +143,7 @@ type AddCardToDashboardRequest struct {
 // CreateCardRequest is the payload for creating a saved question (card).
 type CreateCardRequest struct {
 	Name                  string         `json:"name"`
+	Type                  string         `json:"type,omitempty"`
 	Description           string         `json:"description,omitempty"`
 	Display               string         `json:"display"`
 	CollectionID          *int           `json:"collection_id,omitempty"`
@@ -154,6 +155,7 @@ type CreateCardRequest struct {
 // All fields are optional — only non-zero values are sent.
 type UpdateCardRequest struct {
 	Name                  string         `json:"name,omitempty"`
+	Type                  string         `json:"type,omitempty"`
 	Description           string         `json:"description,omitempty"`
 	Display               string         `json:"display,omitempty"`
 	DatasetQuery          *DatasetQuery  `json:"dataset_query,omitempty"`
